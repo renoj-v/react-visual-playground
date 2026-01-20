@@ -4,7 +4,7 @@ import { TypingText } from './components/TypingText';
 import { GradientText } from './components/GradientText';
 import { CountUp } from './components/CountUp';
 import { ShinyButton } from './components/ShinyButton';
-import { ParticlesBackground } from './components/ParticlesBackground';
+import  Particles from './components/ParticlesBackground';
 import { ContextSummary } from './components/ContextSummary';
 import { useContextManager } from './context/ContextManager';
 
@@ -35,11 +35,18 @@ function App() {
   };
 
   return (
-    <ParticlesBackground
-      particleCount={60}
-      particleColor="rgba(147, 51, 234, 0.4)"
-      className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900"
-    >
+    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      <Particles
+        particleColors={["#ffffff"]}
+        particleCount={200}
+        particleSpread={10}
+        speed={0.1}
+        particleBaseSize={100}
+        moveParticlesOnHover
+        alphaParticles={false}
+        disableRotation={false}
+        pixelRatio={1}
+      />
       <div className="container mx-auto px-4 py-12">
         {/* Header Section */}
         <div className="text-center mb-12">
@@ -190,7 +197,7 @@ function App() {
           </div>
         </div>
       </div>
-    </ParticlesBackground>
+    </div>
   );
 }
 
