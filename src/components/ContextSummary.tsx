@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useContextManager } from '../context/ContextManager';
-import { AnimatedButton } from './AnimatedButton';
+import { ShinyButton } from './ShinyButton';
 
 export const ContextSummary = () => {
   const { state, clearContext, exportContext } = useContextManager();
@@ -21,9 +21,9 @@ export const ContextSummary = () => {
   };
 
   const typeColors = {
-    interaction: 'bg-green-500/20 border-green-500',
-    state_change: 'bg-blue-500/20 border-blue-500',
-    session_info: 'bg-purple-500/20 border-purple-500',
+    interaction: 'border-l-green-500 bg-green-500/10',
+    state_change: 'border-l-blue-500 bg-blue-500/10',
+    session_info: 'border-l-purple-500 bg-purple-500/10',
   };
 
   const sessionDuration = formatDuration(
@@ -42,29 +42,29 @@ export const ContextSummary = () => {
         </div>
       </div>
 
-      <div className="flex gap-3 mb-6">
-        <AnimatedButton
-          variant="primary"
+      <div className="flex flex-wrap gap-3 mb-6">
+        <ShinyButton
           onClick={() => setIsExpanded(!isExpanded)}
+          className="bg-gradient-to-r from-blue-500 to-purple-500"
         >
           {isExpanded ? 'Hide Details' : 'Show Details'}
-        </AnimatedButton>
-        <AnimatedButton
-          variant="secondary"
+        </ShinyButton>
+        <ShinyButton
           onClick={exportContext}
+          className="bg-gradient-to-r from-gray-600 to-gray-700"
         >
           Export JSON
-        </AnimatedButton>
-        <AnimatedButton
-          variant="danger"
+        </ShinyButton>
+        <ShinyButton
           onClick={() => {
             if (window.confirm('Are you sure you want to clear all context data?')) {
               clearContext();
             }
           }}
+          className="bg-gradient-to-r from-red-600 to-red-700"
         >
           Clear Context
-        </AnimatedButton>
+        </ShinyButton>
       </div>
 
       {isExpanded && (

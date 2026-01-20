@@ -1,36 +1,46 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface BlurTextProps {
   text: string;
   delay?: number;
+  animateBy?: 'words' | 'characters';
   className?: string;
 }
 
-export const BlurText = ({ text, delay = 50, className = '' }: BlurTextProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+export const BlurText = ({
+  text,
+  delay = 50,
+  animateBy = 'characters',
+  className = ''
+}: BlurTextProps) => {
+  const [visibleCount, setVisibleCount] = useState(0);
+
+  const segments = animateBy === 'words'
+    ? text.split(' ')
+    : text.split('');
 
   useEffect(() => {
-    if (currentIndex < text.length) {
+    if (visibleCount < segments.length) {
       const timeout = setTimeout(() => {
-        setCurrentIndex(prev => prev + 1);
+        setVisibleCount(prev => prev + 1);
       }, delay);
-
       return () => clearTimeout(timeout);
     }
-  }, [currentIndex, delay, text]);
+  }, [visibleCount, segments.length, delay]);
 
   return (
     <div className={`text-4xl font-bold ${className}`}>
-      {text.split('').map((char, index) => (
+      {segments.map((segment, index) => (
         <span
           key={index}
           className={`inline-block transition-all duration-500 ${
-            index < currentIndex
+            index < visibleCount
               ? 'opacity-100 blur-0'
               : 'opacity-0 blur-md'
           }`}
         >
-          {char === ' ' ? '\u00A0' : char}
+          {segment}
+          {animateBy === 'words' && index < segments.length - 1 && '\u00A0'}
         </span>
       ))}
     </div>

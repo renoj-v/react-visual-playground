@@ -5,14 +5,21 @@ A modern React application built with Vite, featuring animated React Bits compon
 ## Features
 
 ### React Bits Components
-This project showcases several animated and interactive components inspired by [React Bits](https://reactbits.dev):
 
-- **BlurText** - Animated text reveal with blur effect
-- **FadeInText** - Smooth fade-in animation for text
-- **AnimatedButton** - Interactive buttons with hover and click animations
-- **GradientBackground** - Dynamic animated gradient backgrounds with floating orbs
+This project showcases animated and interactive components inspired by [React Bits](https://reactbits.dev):
+
+#### Text Animations
+- **BlurText** - Multi-stage blur-to-focus animation with word or character-level control
+- **TypingText** - Typewriter effect with customizable speed and cursor
+- **GradientText** - Animated gradient text with color customization
+- **CountUp** - Smooth number animation counter with easing
+
+#### UI Components
+- **ShinyButton** - Interactive gradient buttons with shiny hover effect
+- **ParticlesBackground** - Animated particle system with connection lines
 
 ### Context Management System
+
 A robust context tracking system that captures and stores application state:
 
 - **Interaction Tracking** - Records all user interactions with timestamps
@@ -69,10 +76,12 @@ react-visual-playground/
 │   └── vite.svg              # Favicon
 ├── src/
 │   ├── components/
-│   │   ├── AnimatedButton.tsx    # Interactive button component
-│   │   ├── BlurText.tsx          # Animated blur text effect
-│   │   ├── FadeInText.tsx        # Fade-in animation component
-│   │   ├── GradientBackground.tsx # Animated gradient background
+│   │   ├── BlurText.tsx          # Blur-to-focus text animation
+│   │   ├── TypingText.tsx        # Typewriter effect
+│   │   ├── GradientText.tsx      # Animated gradient text
+│   │   ├── CountUp.tsx           # Number animation counter
+│   │   ├── ShinyButton.tsx       # Gradient shiny button
+│   │   ├── ParticlesBackground.tsx # Animated particle system
 │   │   └── ContextSummary.tsx    # Context viewer component
 │   ├── context/
 │   │   └── ContextManager.tsx    # Context management system
@@ -105,13 +114,77 @@ Each context entry includes:
 - **Description**: Human-readable description
 - **Data**: Additional metadata about the event
 
-### Customizing Components
+## Component Examples
 
-All React Bits components are implemented locally and can be customized:
+### BlurText
 
-- Modify animation timing in component props
-- Adjust colors and styles using Tailwind classes
-- Extend functionality by editing component files in `src/components/`
+```tsx
+<BlurText
+  text="Hello World"
+  delay={50}
+  animateBy="characters" // or "words"
+  className="text-white"
+/>
+```
+
+### TypingText
+
+```tsx
+<TypingText
+  text="Type this text..."
+  speed={100}
+  showCursor={true}
+  cursorChar="|"
+/>
+```
+
+### GradientText
+
+```tsx
+<GradientText
+  from="from-purple-400"
+  via="via-pink-500"
+  to="to-red-500"
+  animate={true}
+>
+  Animated Gradient
+</GradientText>
+```
+
+### CountUp
+
+```tsx
+<CountUp
+  end={100}
+  start={0}
+  duration={2000}
+  prefix="$"
+  suffix="+"
+/>
+```
+
+### ShinyButton
+
+```tsx
+<ShinyButton
+  onClick={() => console.log('Clicked!')}
+  className="bg-gradient-to-r from-blue-500 to-purple-500"
+>
+  Click Me
+</ShinyButton>
+```
+
+### ParticlesBackground
+
+```tsx
+<ParticlesBackground
+  particleCount={60}
+  particleColor="rgba(147, 51, 234, 0.4)"
+  className="min-h-screen"
+>
+  <div>Your content here</div>
+</ParticlesBackground>
+```
 
 ## Technologies Used
 
