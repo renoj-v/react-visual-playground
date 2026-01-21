@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, ReactNode } from 'react';
 import { Renderer, Camera, Geometry, Program, Mesh } from 'ogl';
 
 interface ParticlesProps {
+  children?: ReactNode;
   particleCount?: number;
   particleSpread?: number;
   speed?: number;
@@ -101,6 +102,7 @@ const fragment = /* glsl */ `
 `;
 
 const Particles: React.FC<ParticlesProps> = ({
+  children,
   particleCount = 200,
   particleSpread = 10,
   speed = 0.1,
@@ -249,7 +251,16 @@ const Particles: React.FC<ParticlesProps> = ({
     pixelRatio
   ]);
 
-  return <div ref={containerRef} className={`relative w-full h-full ${className}`} />;
+  return (
+    <div className={`relative w-full h-full ${className}`}>
+      <div ref={containerRef} className="absolute inset-0" />
+      {children && (
+        <div className="relative z-10 w-full h-full">
+          {children}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Particles;
