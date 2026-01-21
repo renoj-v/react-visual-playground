@@ -7,6 +7,8 @@ import { ShinyButton } from './components/ShinyButton';
 import  Particles from './components/ParticlesBackground';
 import { ContextSummary } from './components/ContextSummary';
 import { useContextManager } from './context/ContextManager';
+import { Textbox } from './components/Textbox';
+
 
 function App() {
   const { addEntry } = useContextManager();
@@ -46,7 +48,12 @@ function App() {
         alphaParticles={true}
         disableRotation={false}
         pixelRatio={1}
-      />
+      >
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Textbox />
+        </div>
+        
+      </Particles>
       <div className="container mx-auto px-4 py-12">
         {/* Header Section */}
         <div className="text-center mb-12">
