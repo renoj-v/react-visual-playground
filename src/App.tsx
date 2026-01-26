@@ -8,7 +8,7 @@ import  Particles from './components/ParticlesBackground';
 import { ContextSummary } from './components/ContextSummary';
 import { useContextManager } from './context/ContextManager';
 import { Textbox } from './components/Textbox';
-
+import { BackgroundScreen } from './components/BackgroundScreen';
 
 function App() {
   const { addEntry } = useContextManager();
@@ -37,7 +37,9 @@ function App() {
   };
 
   return (
+    
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      <BackgroundScreen />
       <Particles
         particleColors={["#ffffff"]}
         particleCount={180}
