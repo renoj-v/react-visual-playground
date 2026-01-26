@@ -2,46 +2,50 @@ import React from 'react';
 
 interface BackgroundScreenProps {
   className?: string;
-  /** Gradient stop at top (dark) — hex */
+  /** main-gradient: top stop (dark navy) — hex */
   topColor?: string;
-  /** Gradient stop in middle — hex */
+  /** main-gradient: middle stop (royal blue) — hex */
   midColor?: string;
-  /** Gradient stop at bottom (light) — hex */
+  /** main-gradient: bottom stop (light blue) — hex */
   bottomColor?: string;
-  /** Blur radius for gradient softening (SVG stdDeviation) */
-  blurAmount?: number;
-  /** Noise intensity (feTurbulence baseFrequency, higher = finer) */
+  /** film-grain-noise: feTurbulence baseFrequency */
   noiseFreq?: number;
-  /** Noise opacity 0–1 */
+  /** film-grain-noise: overlay opacity ~5–10% */
   noiseOpacity?: number;
-  /** Animation duration in seconds for the ambient drift */
-  animationDuration?: number;
 }
 
-const DEFAULT_TOP = '#1C2956';
-const DEFAULT_MID = '#3D6BE0';
-const DEFAULT_BOTTOM = '#95BFEE';
+const DEFAULT_TOP = '#0A1133';
+const DEFAULT_MID = '#2E70D9';
+const DEFAULT_BOTTOM = '#B4C6E7';
 
 /**
- * Full-screen background from Figma (node 316:11): vertical gradient with
- * blur, noise, and dark top shadow, implemented entirely in SVG.
+ * Background from Figma 20Q (node 316:11). Layers match frame exactly:
+ * - main-gradient: full-canvas vertical gradient
+ * - top-dark-shadow: organic, wavy lower-edge shape over top ~30–40%, heavily blurred
+ * - film-grain-noise: full-area overlay on top
  */
 export const BackgroundScreen: React.FC<BackgroundScreenProps> = ({
   className = '',
   topColor = DEFAULT_TOP,
   midColor = DEFAULT_MID,
   bottomColor = DEFAULT_BOTTOM,
-  blurAmount = 0.6,
   noiseFreq = 0.7,
   noiseOpacity = 0.08,
-  animationDuration = 60,
 }) => {
   const id = React.useId().replace(/:/g, '-');
-  const gradId = `bg-grad-${id}`;
-  const shadowGradId = `bg-shadow-${id}`;
-  const shadowBlurId = `bg-shadowblur-${id}`;
-  const compositeId = `bg-composite-${id}`;
+  const mainGradientId = `main-gradient-${id}`;
+  const topDarkShadowBlurFilterId = `top-dark-shadow-blur-${id}`;
+  const filmGrainNoiseFilterId = `film-grain-noise-${id}`;
+
+  const w = 1440;
+  const h = 900;
+
+  // top-dark-shadow: wavy lower boundary (organic, ~top 30–40%). Path: top → right → wavy bottom → left → close.
+  const topDarkShadowPath =
+    'M 0 0 L 1440 0 L 1440 280 C 1200 380 960 260 720 360 C 480 460 240 300 0 380 L 0 0 Z';
   const animationName = `bg-drift-${id}`;
+  const animationDuration = 10;
+
 
   return (
     <div
@@ -58,161 +62,91 @@ export const BackgroundScreen: React.FC<BackgroundScreenProps> = ({
       </style>
       <svg
         aria-hidden
-        className="block h-full"
-        viewBox="0 0 2880 900"
+        className="block h-full w-full"
+        viewBox={`0 0 ${w} ${h}`}
         preserveAspectRatio="xMidYMid slice"
         style={{
           minHeight: '100vh',
-          width: '100vw',
+          width: '200vw',
           animation: `${animationName} ${animationDuration}s linear infinite`,
         }}
       >
-      <defs>
-        {/* Base gradient: dark top → mid blue → light bottom */}
-        <linearGradient
-          id={gradId}
-          x1="0%"
-          y1="0%"
-          x2="0%"
-          y2="100%"
-          gradientUnits="userSpaceOnUse"
-          gradientTransform="translate(0, 0)"
-        >
-          <stop offset="0%" stopColor={topColor} />
-          <stop offset="35%" stopColor={midColor} />
-          <stop offset="100%" stopColor={bottomColor} />
-        </linearGradient>
+        <defs>
+          {/* main-gradient: full-canvas vertical gradient, dark top → royal mid → light bottom */}
+          <linearGradient
+            id={mainGradientId}
+            x1="0%"
+            y1="0%"
+            x2="0%"
+            y2="100%"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor={topColor} />
+            <stop offset="32%" stopColor={midColor} />
+            <stop offset="100%" stopColor={bottomColor} />
+          </linearGradient>
 
-        {/* Dark atmospheric shadow overlay (top) */}
-        <linearGradient
-          id={shadowGradId}
-          x1="0%"
-          y1="0%"
-          x2="0%"
-          y2="100%"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop offset="0%" stopColor="#0d1220" stopOpacity="0.85" />
-          <stop offset="25%" stopColor="#0d1220" stopOpacity="0.4" />
-          <stop offset="55%" stopColor="transparent" stopOpacity="0" />
-        </linearGradient>
+          {/* top-dark-shadow: heavy gaussian blur for soft, diffused edges */}
+          <filter
+            id={topDarkShadowBlurFilterId}
+            x="-25%"
+            y="-25%"
+            width="150%"
+            height="150%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur in="SourceGraphic" stdDeviation="80" result="blurred" />
+          </filter>
 
-        {/* Blur for gradient layer */}
-        <filter
-          id={shadowBlurId}
-          x="-20%"
-          y="-20%"
-          width="140%"
-          height="140%"
-          colorInterpolationFilters="sRGB"
-        >
-          <feGaussianBlur in="SourceGraphic" stdDeviation={blurAmount} result="blurred" />
-        </filter>
+          {/* film-grain-noise: monochrome fractal noise blended over SourceGraphic */}
+          <filter
+            id={filmGrainNoiseFilterId}
+            x="0%"
+            y="0%"
+            width="100%"
+            height="100%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency={noiseFreq}
+              numOctaves="3"
+              result="turb"
+            />
+            <feColorMatrix in="turb" type="saturate" values="0" result="noiseMono" />
+            <feComponentTransfer in="noiseMono" result="noiseLayer">
+              <feFuncR type="linear" slope="0.5" intercept="0.5" />
+              <feFuncG type="linear" slope="0.5" intercept="0.5" />
+              <feFuncB type="linear" slope="0.5" intercept="0.5" />
+              <feFuncA type="linear" slope={noiseOpacity} intercept="0" />
+            </feComponentTransfer>
+            <feBlend in="SourceGraphic" in2="noiseLayer" mode="overlay" result="noised" />
+          </filter>
+        </defs>
 
-        {/* Blur for shadow layer (softer shadow edge) */}
-        <filter
-          id={shadowBlurId}
-          x="-10%"
-          y="-10%"
-          width="120%"
-          height="120%"
-          colorInterpolationFilters="sRGB"
-        >
-          <feGaussianBlur in="SourceGraphic" stdDeviation="40" result="shadowBlurred" />
-        </filter>
-
-        {/* Noise texture — fractalNoise for film-grain look */}
-        <filter
-          id={compositeId}
-          x="0%"
-          y="0%"
-          width="100%"
-          height="100%"
-          colorInterpolationFilters="sRGB"
-        >
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency={noiseFreq}
-            numOctaves="3"
-            result="turb"
+        {/* film-grain-noise applied over the whole stack (topmost in Figma) */}
+        <g filter={`url(#${filmGrainNoiseFilterId})`}>
+          {/* main-gradient: fills entire frame */}
+          <rect
+            x={0}
+            y={0}
+            width={w}
+            height={h}
+            fill={`url(#${mainGradientId})`}
+            data-layer-name="main-gradient"
           />
-          <feColorMatrix
-            in="turb"
-            type="saturate"
-            values="0"
-            result="noiseMono"
-          />
-          <feComponentTransfer in="noiseMono" result="noiseAdj">
-            <feFuncA type="linear" slope={noiseOpacity} intercept="0" />
-          </feComponentTransfer>
-          <feBlend in="SourceGraphic" in2="noiseAdj" mode="overlay" result="noised" />
-        </filter>
 
-        {/* Composite: gradient + blur, then noise overlay */}
-        <filter
-          id={compositeId}
-          x="-20%"
-          y="-20%"
-          width="140%"
-          height="140%"
-          colorInterpolationFilters="sRGB"
-        >
-          <feGaussianBlur in="SourceGraphic" stdDeviation={blurAmount} result="blurred" />
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency={noiseFreq}
-            numOctaves="3"
-            result="turb"
-          />
-          <feColorMatrix in="turb" type="saturate" values="0" result="noiseMono" />
-          <feComponentTransfer in="noiseMono" result="noiseLayer">
-            <feFuncR type="linear" slope="0.5" intercept="0.5" />
-            <feFuncG type="linear" slope="0.5" intercept="0.5" />
-            <feFuncB type="linear" slope="0.5" intercept="0.5" />
-            <feFuncA type="linear" slope={noiseOpacity} intercept="0" />
-          </feComponentTransfer>
-          <feBlend in="blurred" in2="noiseLayer" mode="overlay" result="gradNoised" />
-        </filter>
-      </defs>
-
-      {/* Layer 1: gradient with blur + noise (single filter) - first tile */}
-      <rect
-        x="0"
-        y="0"
-        width="1440"
-        height="900"
-        fill={`url(#${gradId})`}
-        filter={`url(#${compositeId})`}
-      />
-      {/* Layer 1: gradient - second tile for seamless loop */}
-      <rect
-        x="1440"
-        y="0"
-        width="1440"
-        height="900"
-        fill={`url(#${gradId})`}
-        filter={`url(#${compositeId})`}
-      />
-
-      {/* Layer 2: dark top shadow (blurred for soft edge) - first tile */}
-      <rect
-        x="0"
-        y="0"
-        width="1440"
-        height="900"
-        fill={`url(#${shadowGradId})`}
-        filter={`url(#${shadowBlurId})`}
-      />
-      {/* Layer 2: shadow - second tile for seamless loop */}
-      <rect
-        x="1440"
-        y="0"
-        width="1440"
-        height="900"
-        fill={`url(#${shadowGradId})`}
-        filter={`url(#${shadowBlurId})`}
-      />
-    </svg>
+          {/* top-dark-shadow: organic shape from top with wavy lower edge, covers ~top 30–40% */}
+          <g filter={`url(#${topDarkShadowBlurFilterId})`} data-layer-name="top-dark-shadow">
+            <path
+              d={topDarkShadowPath}
+              fill="#060B24"
+              fillOpacity={0.92}
+              data-layer-name="top-dark-shadow"
+            />
+          </g>
+        </g>
+      </svg>
     </div>
   );
 };
