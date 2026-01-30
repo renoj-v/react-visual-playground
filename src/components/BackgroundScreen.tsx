@@ -15,8 +15,8 @@ export const BackgroundScreen: React.FC<BackgroundScreenProps> = ({
       >
         <style>{`
           @keyframes bg-rotate {
-            from { transform: translate(-50%, 250%) rotate(0deg) scale(7); }
-            to { transform: translate(-50%, 250%) rotate(360deg) scale(7); }
+            from { transform: translate(-50%, 160%) rotate(0deg) scale(5); }
+            to { transform: translate(-50%, 160%) rotate(360deg) scale(5); }
           }
         `}</style>
         <img
@@ -27,8 +27,8 @@ export const BackgroundScreen: React.FC<BackgroundScreenProps> = ({
             position: 'absolute',
             left: '50%',
             bottom: '0',
-            transform: 'translate(0, 0) rotate(0deg) scale(4)',
-            animation: 'bg-rotate 60s linear infinite',
+            transform: 'translate(0, 0) rotate(0deg) scale(5)',
+            animation: 'bg-rotate 300s linear infinite',
             width: '100vw',
             height: '100vh',
           }}
